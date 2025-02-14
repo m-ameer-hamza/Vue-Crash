@@ -1,6 +1,6 @@
 <script setup>
-import { RouterLink, useRoute } from 'vue-router';
-import logo from '@/assets/img/logo.png';
+import { RouterLink, useRoute } from "vue-router";
+import logo from "@/assets/img/logo.png";
 
 const isActiveLink = (routePath) => {
   const route = useRoute();
@@ -23,7 +23,8 @@ const isActiveLink = (routePath) => {
             >
           </RouterLink>
           <div class="md:ml-auto">
-            <div class="flex space-x-2">
+            <!-- Displayed only when user is logged in -->
+            <!-- <div class="flex space-x-2">
               <RouterLink
                 to="/"
                 :class="[
@@ -62,6 +63,36 @@ const isActiveLink = (routePath) => {
                   'rounded-md',
                 ]"
                 >Add Job</RouterLink
+              >
+            </div> -->
+            <!-- Displayed only when user is not logged in -->
+            <div class="flex space-x-10">
+              <RouterLink
+                to="/login"
+                :class="[
+                  isActiveLink('/login')
+                    ? 'bg-green-900'
+                    : 'hover:bg-gray-900 hover:text-white',
+                  'text-white',
+                  'px-3',
+                  'py-2',
+                  'rounded-md',
+                ]"
+                >Login</RouterLink
+              >
+
+              <RouterLink
+                to="/"
+                :class="[
+                  isActiveLink('/')
+                    ? 'bg-green-900'
+                    : 'hover:bg-gray-900 hover:text-white',
+                  'text-white',
+                  'px-3',
+                  'py-2',
+                  'rounded-md',
+                ]"
+                >Register Now</RouterLink
               >
             </div>
           </div>
