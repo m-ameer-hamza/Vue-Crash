@@ -1,6 +1,8 @@
 <script setup>
-import { defineProps, reactive, watch } from "vue";
+import { defineProps, reactive, ref } from "vue";
 import { RouterLink } from "vue-router";
+import authAPI from "../apis/authAPI.JS";
+import { useQuery } from "@tanstack/vue-query";
 
 // Define props using defineProps
 const props = defineProps({
@@ -21,6 +23,10 @@ const props = defineProps({
     default: "Register",
   },
 });
+
+const registerBtnClicked = ref(false);
+const loginBtnClicked = ref(false);
+const { register, login } = authAPI();
 
 const form = reactive({
   name: "",
@@ -80,15 +86,33 @@ function handleSubmit(formType) {
   if (formType === "register") {
     validateRegisterForm();
     if (!Object.values(errors).some((error) => error)) {
+      registerBtnClicked.value = true;
       console.log("Register Form is valid.", form);
     }
   } else {
     validateLoginForm();
     if (!Object.values(errors).some((error) => error)) {
       console.log("Login Form is valid.", form);
+      loginBtnClicked.value = true;
     }
   }
 }
+
+//Query functions for APIs
+const { isLoading } = useQuery(
+  ["register", form.value],
+  () => register(form.value),
+  {
+    enabled: registerBtnClicked.value,
+    onSuccess: () => {
+      toast.success("Registration Successful");
+    },
+    onError: (error) => {
+      console.error(error.message);
+      toast.error("Registration Failed");
+    },
+  }
+);
 </script>
 
 <template>
@@ -166,8 +190,12 @@ function handleSubmit(formType) {
           @click="handleSubmit('register')"
           class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg transition duration-300"
         >
-          <i class="pi pi-check mr-2"></i>
-          Register
+          <!-- When loading, show spinner and "Sing In ...." -->
+          <template v-if="isLoading">
+            <!-- The spinner component with some right margin -->
+            <PulseLoader :loading="isLoading" color="#fff" class="mr-2" />
+            <span>Sing In .....</span>
+          </template>
         </button>
         <button
           type="button"
