@@ -1,27 +1,97 @@
-<script>
-import { defineProps } from "vue";
+<script setup>
+import { defineProps, reactive, watch } from "vue";
 import { RouterLink } from "vue-router";
-export default {
-  props: {
-    showName: {
-      type: Boolean,
-      default: true,
-    },
-    showRegisterAs: {
-      type: Boolean,
-      default: true,
-    },
-    formTitle: {
-      type: String,
-      default: "Register",
-    },
-    btnTitle: {
-      type: String,
-      default: "Register",
-    },
+
+// Define props using defineProps
+const props = defineProps({
+  showName: {
+    type: Boolean,
+    default: true,
   },
-};
+  showRegisterAs: {
+    type: Boolean,
+    default: true,
+  },
+  formTitle: {
+    type: String,
+    default: "Register",
+  },
+  btnTitle: {
+    type: String,
+    default: "Register",
+  },
+});
+
+// Reactive state for the form and errors
+const form = reactive({
+  name: "",
+  email: "",
+  password: "",
+  registerAs: "",
+});
+
+const errors = reactive({
+  name: false,
+  email: false,
+  password: false,
+  registerAs: false,
+});
+
+const nameRegex = /^[A-Za-z]{5,}$/;
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/;
+
+function validateRegisterForm() {
+  //validate regitration
+
+  if (!nameRegex.test(form.name)) {
+    errors.name = true;
+  } else {
+    errors.name = false;
+  }
+  if (!emailRegex.test(form.email)) {
+    errors.email = true;
+  } else {
+    errors.email = false;
+  }
+  if (!passwordRegex.test(form.password)) {
+    errors.password = true;
+  } else {
+    errors.password = false;
+  }
+}
+
+function validateLoginForm() {
+  //validate login
+  if (!emailRegex.test(form.email)) {
+    errors.email = true;
+  } else {
+    errors.email = false;
+  }
+  if (!passwordRegex.test(form.password)) {
+    errors.password = true;
+  } else {
+    errors.password = false;
+  }
+}
+
+function handleSubmit(formType) {
+  if (formType === "register") {
+    validateRegisterForm();
+    if (!Object.values(errors).some((error) => error)) {
+      console.log("Register Form is valid.", form);
+    }
+  } else {
+    validateLoginForm();
+    if (!Object.values(errors).some((error) => error)) {
+      console.log("Login Form is valid.", form);
+    }
+  }
+}
 </script>
+
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 pb-4">
     <div class="w-full max-w-lg p-10 space-y-8 bg-white rounded-lg shadow-lg">
@@ -36,9 +106,13 @@ export default {
           </span>
           <input
             type="text"
+            v-model="form.name"
             placeholder="Name"
             class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           />
+          <p v-if="errors.name" class="text-red-700">
+            *Min 5 letters and no special character
+          </p>
         </div>
         <!-- Email Field -->
         <div class="relative">
@@ -47,9 +121,11 @@ export default {
           </span>
           <input
             type="email"
+            v-model="form.email"
             placeholder="Email"
             class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           />
+          <p v-if="errors.email" class="text-red-700">*Email is Invalide</p>
         </div>
         <!-- Password Field -->
         <div class="relative">
@@ -58,9 +134,13 @@ export default {
           </span>
           <input
             type="password"
+            v-model="form.password"
             placeholder="Password"
             class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           />
+          <p v-if="errors.password" class="text-red-700">
+            *Min 8 characters and mix with special character
+          </p>
         </div>
         <!-- Register As Dropdown -->
         <div class="relative" v-if="showRegisterAs">
@@ -68,26 +148,32 @@ export default {
             <i class="pi pi-users text-green-500"></i>
           </span>
           <select
+            v-model="form.registerAs"
             class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="" disabled selected>Register as</option>
             <option value="admin">Admin</option>
             <option value="user">User</option>
           </select>
+          <p v-if="errors.registerAs" class="text-red-700">
+            * select regsiter as
+          </p>
         </div>
         <!-- Register Button -->
 
         <button
+          type="button"
           v-if="btnTitle === 'Register'"
-          type="submit"
+          @click="handleSubmit('register')"
           class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg transition duration-300"
         >
           <i class="pi pi-check mr-2"></i>
           Register
         </button>
         <button
+          type="button"
           v-else
-          type="submit"
+          @click="handleSubmit('login')"
           class="w-full flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-lg transition duration-300"
         >
           <i class="pi pi-check mr-2"></i>

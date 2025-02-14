@@ -63,6 +63,10 @@ onMounted(async () => {
 //   }
 // });
 
+function updateFilter(filterType) {
+  filterValue.value = filterType;
+}
+
 watch([searchQuery, filterValue], ([newSearch, newFilter]) => {
   const trimmedQuery = newSearch.trim();
 
