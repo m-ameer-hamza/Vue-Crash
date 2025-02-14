@@ -22,7 +22,6 @@ const props = defineProps({
   },
 });
 
-// Reactive state for the form and errors
 const form = reactive({
   name: "",
   email: "",
